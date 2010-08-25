@@ -1,0 +1,15 @@
+.class {
+
+    /* omit me! {} *** ; () \* */
+    background-color: white;
+
+    div {
+        color: red;
+    }
+
+    span {
+        .first { margin-top: 10px; }
+        .last { margin-bottom: 10px; }
+    }
+
+}

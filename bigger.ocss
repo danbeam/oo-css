@@ -1,0 +1,12 @@
+
+#id > children.className {
+
+    background-color: white /* omit me! {} *** ; () \* */;
+
+        .first { margin-top: 10px; }
+        .last { margin-bottom: 10px; }
+
+    _background-color: white /* omit me! {} *** ; () \* */;
+    *background-color: white /* omit me! {} *** ; () \* */;
+    /**/background-color: white /* omit me! {} *** ; () \* */;
+}
