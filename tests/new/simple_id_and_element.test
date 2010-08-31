@@ -1,0 +1,9 @@
+#id {
+
+    background-color: white;
+
+    div {
+        color: black;
+    }
+
+}

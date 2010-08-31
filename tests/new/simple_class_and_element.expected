@@ -1,0 +1,6 @@
+.class {
+    background-color: white;
+}
+.class span {
+    margin-bottom: 10px;
+}
