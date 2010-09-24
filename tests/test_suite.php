@@ -27,13 +27,23 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
         }
     }
 
+    public function fileToDesc ($file) {
+        return str_replace('_', ' ', ucfirst(substr(basename($file), 0, -5)));
+    }
+
     public function testAll () {
         echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
+///         echo "=================================================================================\n";
+///         echo str_replace('_', ' ', $test) . "\n";
+///         echo "=================================================================================\n";
+///         echo file_get_contents($test);
+///         echo "---------------------------------------------------------------------------------\n";
+///         echo $this->proxy->parse($test);
             $this->assertEquals(
                 $this->proxy->parse($test),
                 file_get_contents(substr($test, 0, -5).".expected"),
-                str_replace('_', ' ', ucfirst(substr(basename($test), 0, -5)))
+                $this->fileToDesc($test)
             );
         }
     }
