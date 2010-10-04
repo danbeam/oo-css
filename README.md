@@ -31,18 +31,34 @@ What if we could make CSS more object-oriented to group our rules and selector t
 
     /* class named class is a great name! */
     div.class {
+
         /* everything in this div has red text! */
         color: red;
+
         /* except links */
         a:active, a:link, a:visited {
             color: black;
         }
+
         /* and :hover links are different too! */
         a:hover {
             color: blue;
         }
     }
 
+And we could take this and automatically re-arrange it down to 
+
+    div.class {
+        color: red;
+    }
+    div.class a:active, div.class a:link, div.class a:visited {
+        color: black;
+    }
+    div.class a:hover {
+        color: blue;
+    }
+
+automatically for you?  Well, look no more!
 
 How do I use this?
 ------------------
