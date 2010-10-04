@@ -55,12 +55,12 @@ And lastly, for those CLI junkies like myself, you can run it from the command-l
 
 Here's how you'd use it:
 
-    cd to/path/where/i/cloned/oo-php ; # move to location of script
+    cd to/path/where/i/cloned/oo-css ; # move to location of script
 
 And then you can run with the php command with a single file or glob of files you want to be converted:
 
-    php oo_php.php css/oo_src_file.css
-    php oo_php.php css/*.css
+    php oo_css.php css/oo_src_file.css
+    php oo_css.php css/*.css
 
 Or additionally, you can add the line
 
@@ -72,5 +72,5 @@ at the top of oo_css.php, and run the command
 
 adding execution permissions for your user to run that file like so:
 
-    ./oo_php.php css/oo_src_files.css
-    ./oo_php.php css/*.css
+    ./oo_css.php css/oo_src_files.css
+    ./oo_css.php css/*.css
