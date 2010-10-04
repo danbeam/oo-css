@@ -47,6 +47,21 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
             );
         }
     }
+
+    public function testAllCLI () {
+        echo "\n" . str_pad(__METHOD__, 60);
+        foreach ($this->tests as $test) {
+            // reset this to blank string every time
+            $actual = '';
+            // exec to emulate PHP CLI use
+            exec('php ' . dirname(dirname(__FILE__)) . '/oo_css.php ' . $test . ' 2>/dev/null', $actual);
+            $this->assertEquals(
+                implode("\n", $actual),
+                rtrim(file_get_contents(substr($test, 0, -5).".expected")),
+                $this->fileToDesc($test)
+            );
+        }
+    }
 }
 
 ?>
