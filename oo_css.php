@@ -1,6 +1,7 @@
 <?php
 
 define('DEBUG', false);
+define('WARN', true);
 
 /**
 * @access   public
@@ -14,7 +15,7 @@ class OO_CSS_Parser {
     * @access   protected
     * For generic debug messages that require higher verbosity
     */
-    protected function debug ($msg = "") {
+    public function debug ($msg = "") {
         if (true === DEBUG) {
             echo "$msg\n";
         }
@@ -26,44 +27,10 @@ class OO_CSS_Parser {
     * @access   protected
     * For warnings like files not being found or readable
     */
-    protected function warn ($msg = "") {
+    public function warn ($msg = "") {
         if (true === WARN) {
             file_put_contents('php://stderr', "$msg\n", FILE_APPEND);
         }
-    }
-
-
-    /**
-    * @method   OO_CSS_Parser::__construct
-    * @access   public
-    */
-    public function __construct () {
-        $this->states = array(
-            // selector
-             0 => array('[^{\/]' => 0, '{' => 1, '/' => 4),
-            // start property or end block or start comment
-             1 => array('a-zA-Z_\-\*\'' => 2, '/' => 4, '\.#' => 0),
-            // property
-             2 => array('/' => 5, 'a-z\-\_\*' => 2, ':' => 3),
-            // value
-             3 => array('/' => 5, '0-9a-zA-Z\-\_\*\.\(\)' => 3),
-            // leading forward slash
-             4 => array('\*' => 5),
-            // start comment
-             5 => array('\*' => 7, '*' => 6),
-            // in comment *
-             6 => array('\*' => 6),
-            // end comment
-             7 => array(),
-            // start inline comment
-             9 => array('\*' => 7, '*' => 6),
-            // inline forward slash
-            10 => array('\*' => 6),
-            // star inline
-            11 => array('/' => 12),
-            // end inline comment
-            12 => array('\*' => 0, '*' => 10),
-        );
     }
 
 
@@ -216,6 +183,31 @@ class OO_CSS_Parser {
         }
         if (!empty($results)) {
             return implode("\n", $results);
+        }
+    }
+}
+
+// if we're on the CLI, check for arguments
+if ('cli' === php_sapi_name() && $argc > 1) {
+    // create a parser lazily
+    $parser = new OO_CSS_Parser();
+    // output this to stderr so normal > redirection doesn't work
+    $parser->warn('Found arguments on CLI, parsing...');
+    // look through args
+    for ($i = 1; $i < $argc; ++$i) {
+        // if the file actually exists
+        if (is_file($argv[$i])) {
+            // and it's readable
+            if (is_readable($argv[$i])) {
+                // just output to stdout atm
+                echo $parser->parse($argv[$i]);
+            }
+            else {
+                $parser->warn($argv[$i] . " isn't readable, skipping.");
+            }
+        }
+        else {
+            $parser->warn($argv[$i] . " doesn't exist, skipping.");
         }
     }
 }
