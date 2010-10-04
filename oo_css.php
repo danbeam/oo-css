@@ -11,8 +11,20 @@ define('WARN', true);
 class OO_CSS_Parser {
 
     /**
+    * @method   OO_CSS_Parser::__constructor
+    * @access   public
+    * To instantiate this class and possibly convert some files
+    */
+    public function __constuctor () {
+        if (func_get_args()) {
+            return OO_CSS_Parser::parse(func_get_args());
+        }
+    }
+
+
+    /**
     * @method   OO_CSS_Parser::debug
-    * @access   protected
+    * @access   public
     * For generic debug messages that require higher verbosity
     */
     public function debug ($msg = "") {
@@ -24,7 +36,7 @@ class OO_CSS_Parser {
 
     /**
     * @method   OO_CSS_Parser::warn
-    * @access   protected
+    * @access   public
     * For warnings like files not being found or readable
     */
     public function warn ($msg = "") {
@@ -46,7 +58,7 @@ class OO_CSS_Parser {
         foreach ($args as $arg) {
             // recurse
             if (is_array($arg)) {
-                $this->flatten($arg, $new);
+                OO_CSS_Parser::flatten($arg, $new);
             }
             // base case
             else {
@@ -68,7 +80,7 @@ class OO_CSS_Parser {
     public function parse () {
 
         // flatten args to allow different ways of calling thi method
-        $files = $this->flatten(func_get_args());
+        $files = OO_CSS_Parser::flatten(func_get_args());
 
         // set up global to hold rendered content
         $results = array();
@@ -97,50 +109,50 @@ class OO_CSS_Parser {
                         // read a char at a time
                         $token .= ($char = fread($handle, 1));
 
-                        //$this->debug("char: $char ".($in_comment?'(comment)':''));
-                        //$this->debug("prev: $prev");
-                        //$this->debug("token: $token");
-                        //$this->debug("stack: " . print_r($rule_stack, true));
+                        //OO_CSS_Parser::debug("char: $char ".($in_comment?'(comment)':''));
+                        //OO_CSS_Parser::debug("prev: $prev");
+                        //OO_CSS_Parser::debug("token: $token");
+                        //OO_CSS_Parser::debug("stack: " . print_r($rule_stack, true));
         
                         // main loop
                         switch ($char) {
         
                             case '{':
-                                $this->debug("Found start of statement list!");
+                                OO_CSS_Parser::debug("Found start of statement list!");
                                 array_push($rule_stack, trim(substr($token, 0, -1)));
                                 $token = '';
                             break;
         
                             case '}':
-                                $this->debug("Found end of statement list!");
+                                OO_CSS_Parser::debug("Found end of statement list!");
                                 array_pop($rule_stack);
                                 $token = '';
                             break;
         
                             case ';':
-                                $this->debug("Found end of rule!");
+                                OO_CSS_Parser::debug("Found end of rule!");
                                 $rules[implode(" ", $rule_stack)][] = trim($token);
                                 $token = '';
                             break;
         
                             case '*':
                                 if ('/' === $prev) {
-                                    $this->debug("Found start of comment!");
+                                    OO_CSS_Parser::debug("Found start of comment!");
                                     $in_comment = true;
                                 }
-                                $this->debug("Found normal token \"$char\"!");
+                                OO_CSS_Parser::debug("Found normal token \"$char\"!");
                             break;
         
                             case '/':
                                 if ('*' === $prev) {
-                                    $this->debug("Found end of comment!");
+                                    OO_CSS_Parser::debug("Found end of comment!");
                                     $in_comment = false;
                                     var_dump($token);
                                     if ('/**/' !== $token) {
                                         $token = '';
                                     }
                                 }
-                                $this->debug("Found normal token \"$char\"!");
+                                OO_CSS_Parser::debug("Found normal token \"$char\"!");
                             break;
         
                             case ' ': case "\n": case "\r": case "\t":
@@ -151,7 +163,7 @@ class OO_CSS_Parser {
                             break;
         
                             default:
-                                $this->debug("Found normal token \"$char\"!");
+                                OO_CSS_Parser::debug("Found normal token \"$char\"!");
                             break;
         
                         }
@@ -174,11 +186,11 @@ class OO_CSS_Parser {
                     $results[] = $result;
                 }
                 else {
-                    $this->warn("$file not readable");
+                    OO_CSS_Parser::warn("$file not readable");
                 }
             }
             else {
-                $this->warn("$file not readable");
+                OO_CSS_Parser::warn("$file not readable");
             }
         }
         if (!empty($results)) {
@@ -189,10 +201,8 @@ class OO_CSS_Parser {
 
 // if we're on the CLI, check for arguments
 if ('cli' === php_sapi_name() && $argc > 1) {
-    // create a parser lazily
-    $parser = new OO_CSS_Parser();
     // output this to stderr so normal > redirection doesn't work
-    $parser->warn('Found arguments on CLI, parsing...');
-    // parse all in array of argv
-    ob_start(); echo $parser->parse(array_slice($argv, 1)); ob_end_flush();
+    OO_CSS_Parser::warn('Found arguments on CLI, parsing...');
+    // parse all arguments passed in on CLI
+    ob_start(); echo OO_CSS_Parser::parse(array_slice($argv, 1)); ob_end_flush();
 }
