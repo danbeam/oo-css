@@ -1,7 +1,48 @@
 OO-CSS
 ======
 
-An object-oriented CSS parser to slightly simplify the lives of web developers everywhere.
+### An object-oriented CSS parser to slightly simplify the lives of web developers everywhere.
+
+What does this do?
+------------------
+
+Have you ever been making a website (particularly a large or complex one) and been frustrated by spaghetti CSS?  For instance, we have:
+
+    /* everything in this div has red text! */
+    div.class {
+        color: red;
+    }
+
+And a couple hundred lines later:
+
+    /* except links */
+    div.class a:active, div.class a:link, div.class a:visited {
+        color: black;
+    }
+
+And in a different stylesheet:
+
+    /* and :hover links are different too! */
+    div.class a:hover {
+        color: blue;
+    }
+
+What if we could make CSS more object-oriented to group our rules and selector together in a logical organization way that says us the time of having to write rules over and over redundantly (like this)?
+
+    /* class named class is a great name! */
+    div.class {
+        /* everything in this div has red text! */
+        color: red;
+        /* except links */
+        a:active, a:link, a:visited {
+            color: black;
+        }
+        /* and :hover links are different too! */
+        a:hover {
+            color: blue;
+        }
+    }
+
 
 How do I use this?
 ------------------
