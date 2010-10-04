@@ -193,21 +193,6 @@ if ('cli' === php_sapi_name() && $argc > 1) {
     $parser = new OO_CSS_Parser();
     // output this to stderr so normal > redirection doesn't work
     $parser->warn('Found arguments on CLI, parsing...');
-    // look through args
-    for ($i = 1; $i < $argc; ++$i) {
-        // if the file actually exists
-        if (is_file($argv[$i])) {
-            // and it's readable
-            if (is_readable($argv[$i])) {
-                // just output to stdout atm
-                echo $parser->parse($argv[$i]);
-            }
-            else {
-                $parser->warn($argv[$i] . " isn't readable, skipping.");
-            }
-        }
-        else {
-            $parser->warn($argv[$i] . " doesn't exist, skipping.");
-        }
-    }
+    // parse all in array of argv
+    ob_start(); echo $parser->parse(array_slice($argv, 1)); ob_end_flush();
 }
