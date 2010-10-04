@@ -24,7 +24,7 @@ On windows, I'd recommends either XAMPP (http://www.apachefriends.org/en/xampp.h
 
 **NOTE:** You've just installed the PHP command line "runtime".  If you want the full capability to serve stuff from a web server like Apache, you can try these alternate commands to install more stuff (instead of just php-cli)
 
-    sudo apt-get php
+    sudo apt-get install php
 
 or
 
