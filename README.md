@@ -27,7 +27,7 @@ And in a different stylesheet:
         color: blue;
     }
 
-What if we could make CSS more object-oriented to group our rules and selector together in a logical organization way that says us the time of having to write rules over and over redundantly (like this)?
+What if we could make CSS more object-oriented in order to group our rules and selectors together in a logical way that saves us time and redundant error?  For example, if we were given a source document of:
 
     /* class named class is a great name! */
     div.class {
@@ -46,7 +46,7 @@ What if we could make CSS more object-oriented to group our rules and selector t
         }
     }
 
-And we could take this and automatically re-arrange it down to 
+With which we automatically re-arrange to:
 
     div.class {
         color: red;
@@ -58,7 +58,7 @@ And we could take this and automatically re-arrange it down to
         color: blue;
     }
 
-automatically for you?  Well, look no more!
+Well, look no more!  This is what OO-CSS does for you with 1 simple PHP script!
 
 How do I use this?
 ------------------
@@ -77,7 +77,7 @@ Or for Redhat based systems, use -
 
 I'm too lazy to look up how to do it using Gentoo or Puppy or Archlinux - send me a patch, haha.
 
-On windows, I'd recommends either XAMPP (http://www.apachefriends.org/en/xampp.html) or WAMP server (http://wampserver.com/en).  I don't really use Windows much any more, so I can't tell you if it works or not, but PHP in general has pretty good cross-platform compatibility.
+On Windows, I'd recommend either XAMPP (http://www.apachefriends.org/en/xampp.html) or WAMP server (http://wampserver.com/en).  I don't really use Windows much any more, so I can't tell you if it works or not, but PHP in general has pretty good cross-platform compatibility (though my tests don't, as they use `exec` in an assumed bash environment).
 
 **NOTE:** You've just installed the PHP command line "runtime".  If you want the full capability to serve stuff from a web server like Apache, you can try these alternate commands to install more stuff (instead of just php-cli)
 
@@ -89,11 +89,11 @@ or
 
 ### Including as a class
 
-If you simply `require`, `include`, `require_once`, or `include_once` the oo_css.php file, you will have access to the OO_CSS_Parser global, which contains methods:
+If you simply `require`, `include`, `require_once`, or `include_once` the /oo_css.php file, you will have access to the OO_CSS_Parser global, which contains methods to:
 
 * parse
-* warn  (if WARN constant is truthy)
-* debug (if DEBUG constant is truthy)
+* warn  (write message to stderr if WARN constant is truthy)
+* debug (write message to stdout if DEBUG constant is truthy)
 
 This can be done with an instance of OO_CSS_Parser, like so:
 
@@ -108,7 +108,7 @@ Or alternately can be called statically (without an instance), like so:
 
 ### Using PHP on the command line
 
-And lastly, for those CLI junkies like myself, you can run it from the command-line!  This assumes you are passing this script filename arguments will be transformed.  This means you can easily integrate this into automated builds (along with minification or static gzipping or whatever strikes you fancy) and even possibly combo (as you put them in the correct order, and by default you'll get a big ball of stuff).  This could be easily combined with the YUI Compressor by Julien Lecomte to deliver the fastest possible websites for you users, :).
+And lastly, for those CLI junkies like myself, you can run OO_CSS_Parser from the command-line!  This assumes you are passing this script filename arguments to be transformed.  This means you can easily integrate this into automated builds (along with minification or static gzipping or whatever strikes your fancy) as well as combine your CSS files together (if you put them in the correct order you'll get a big ball of CSS back).  This could (and should) be combined with the YUI Compressor by Julien Lecomte to deliver the fastest possible websites for your users, :).
 
 Here's how you'd use it:
 
