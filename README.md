@@ -176,4 +176,4 @@ And lastly, like I've mentioned before, you can do magical things like OO CSS ->
     
     .class{background-color:white;}.class span{margin-bottom:10px;}
 
-**NOTE:** This assumes you have the [YUI Compressor](http://yuilibrary.com/downloads/#yuicompressor) jar on your path and Java and gzip installed.
+**NOTE:** This assumes you have the [YUI Compressor](http://yuilibrary.com/downloads/#yuicompressor) jar on your path (named yui and with executable permissions) as well as Java and gzip installed.
