@@ -1,6 +1,6 @@
 div.class {
     color: blue;
 }
-div.class #id, div.class .class, div.class div > span, div.class input[type=submit], div.class html:first-child {
+div.class #id, div.class .class, div.class div > span, div.class input[type=submit], div.class *:first-child+html {
     background: url(some/image/that/doesnt/exist.png);
 }
