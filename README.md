@@ -77,7 +77,7 @@ Or for Redhat based systems, use -
 
 I'm too lazy to look up how to do it using Gentoo or Puppy or Archlinux - send me a patch, haha.
 
-On Windows, I'd recommend either XAMPP (http://www.apachefriends.org/en/xampp.html) or WAMP server (http://wampserver.com/en).  I don't really use Windows much any more, so I can't tell you if it works or not, but PHP in general has pretty good cross-platform compatibility (though my tests don't, as they use `exec` in an assumed bash environment).
+On Windows, I'd recommend either [XAMPP](http://www.apachefriends.org/en/xampp.html) or [WAMP server](http://wampserver.com/en).  I don't really use Windows much any more, so I can't tell you if it works or not, but PHP in general has pretty good cross-platform compatibility (though my tests don't, as they use `exec` in an assumed bash environment).
 
 **NOTE:** You've just installed the PHP command line "runtime".  If you want the full capability to serve stuff from a web server like Apache, you can try these alternate commands to install more stuff (instead of just php-cli)
 
@@ -110,14 +110,14 @@ Or alternately can be called statically (without an instance), like so:
 
 And lastly, for those CLI junkies like myself, you can run OO_CSS_Parser from the command-line!  This assumes you are passing this script filename arguments to be transformed.  This means you can easily integrate this into automated builds (along with minification or static gzipping or whatever strikes your fancy) as well as combine your CSS files together (if you put them in the correct order you'll get a big ball of CSS back).  This could (and should) be combined with the YUI Compressor by Julien Lecomte to deliver the fastest possible websites for your users, :).
 
-Here's how you'd use it:
+Here's how you get it:
 
-    cd to/path/where/i/cloned/oo-css ; # move to location of script
+    git clone git://github.com/danbeam/oo-css.git && cd oo-css ; # we're now within our newly cloned repo!
 
-And then you can run with the php command with a single file or glob of files you want to be converted:
+And then you can run the parser with the `php` command on any number of files or globs you want to be converted:
 
-    php oo_css.php css/oo_src_file.css
-    php oo_css.php css/*.css
+    php oo_css.php css/src_file.oocss
+    php oo_css.php css/*.oocss
 
 Or additionally, you can add the line
 
@@ -129,5 +129,51 @@ at the top of oo_css.php, and run the command
 
 adding execution permissions for your user to run that file like so:
 
-    ./oo_css.php css/oo_src_files.css
-    ./oo_css.php css/*.css
+    ./oo_css.php css/src_file.oocss
+    ./oo_css.php css/*.oocss
+
+Examples and tricks
+-------------------
+
+Here's an example of before:
+
+    me@host:oo-css(master)$ cat tests/new/simple_class_and_element.oocss 
+    .class {
+    
+        background-color: white;
+    
+        span {
+            margin-bottom: 10px;
+        }
+    
+    }
+
+And now we can parse the file from OO to something browsers better understand:
+
+    me@host:oo-css(master)$ php oo_css.php tests/new/simple_class_and_element.oocss 2>/dev/null
+    .class {
+        background-color: white;
+    }
+    .class span {
+        margin-bottom: 10px;
+    }
+
+If you have more than one file, a comment indicating the filename will be automatically output above each file, like this:
+
+    me@host:oo-css(master)$ php oo_css.php tests/new/*.oocss 2>/dev/null
+    /* some/file.oocss */
+
+    /* yada yada, CSS goes here */
+
+    /* some/other/file.oocss */
+    
+    /* and so on */
+
+And lastly, like I've mentioned before, you can do magical things like OO CSS -> CSS -> minified -> gzipped in one line of bash!
+
+    me@host:oo-css(master)$ php oo_css.php some/file.oocss 2>/dev/null | yui --type css | gzip -c > ready_for_prod.css.gz && \
+    echo && zcat ready_for_prod.css.gz && echo
+    
+    .class{background-color:white;}.class span{margin-bottom:10px;}
+
+**NOTE:** This assumes you have the [YUI Compressor](http://yuilibrary.com/downloads/#yuicompressor) jar on your path (named yui and with executable permissions) as well as Java and gzip installed.
