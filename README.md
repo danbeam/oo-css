@@ -137,7 +137,8 @@ Examples and tricks
 
 Here's an example of before:
 
-    me@host:oo-css(master)$ cat tests/new/simple_class_and_element.oocss 
+    me@host:oo-css(master)$ cat tests/new/simple_class_and_element.oocss && echo
+    
     .class {
     
         background-color: white;
@@ -150,7 +151,8 @@ Here's an example of before:
 
 And now we can parse the file from OO to something browsers better understand:
 
-    me@host:oo-css(master)$ php oo_css.php tests/new/simple_class_and_element.oocss 2>/dev/null
+    me@host:oo-css(master)$ php oo_css.php tests/new/simple_class_and_element.oocss 2>/dev/null && echo
+    
     .class {
         background-color: white;
     }
@@ -160,7 +162,8 @@ And now we can parse the file from OO to something browsers better understand:
 
 If you have more than one file, a comment indicating the filename will be automatically output above each file, like this:
 
-    me@host:oo-css(master)$ php oo_css.php tests/new/*.oocss 2>/dev/null
+    me@host:oo-css(master)$ php oo_css.php tests/new/*.oocss 2>/dev/null && echo
+    
     /* some/file.oocss */
 
     /* yada yada, CSS goes here */
