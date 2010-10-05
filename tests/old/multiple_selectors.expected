@@ -1,0 +1,3 @@
+#id, .class, div > span, input[type=submit], html:first-child {
+    background: url(some/image/that/doesnt/exist.png);
+}

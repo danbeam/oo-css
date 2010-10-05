@@ -41,8 +41,8 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
 ///         echo "---------------------------------------------------------------------------------\n";
 ///         echo $this->proxy->parse($test);
             $this->assertEquals(
-                $this->proxy->parse($test),
                 file_get_contents(substr($test, 0, -5).".expected"),
+                $this->proxy->parse($test),
                 $this->fileToDesc($test)
             );
         }
@@ -56,8 +56,8 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
             // exec to emulate PHP CLI use
             exec('php ' . dirname(dirname(__FILE__)) . '/oo_css.php ' . $test . ' 2>/dev/null', $actual);
             $this->assertEquals(
-                implode("\n", $actual),
                 rtrim(file_get_contents(substr($test, 0, -5).".expected")),
+                implode("\n", $actual),
                 $this->fileToDesc($test)
             );
         }
@@ -67,8 +67,8 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
         echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
             $this->assertEquals(
-                OO_CSS_Parser::parse($test),
                 file_get_contents(substr($test, 0, -5).".expected"),
+                OO_CSS_Parser::parse($test),
                 $this->fileToDesc($tests)
             );
         }

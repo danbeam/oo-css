@@ -11,18 +11,6 @@ define('WARN', true);
 class OO_CSS_Parser {
 
     /**
-    * @method   OO_CSS_Parser::__constructor
-    * @access   public
-    * To instantiate this class and possibly convert some files
-    */
-    public function __constuctor () {
-        if (func_get_args()) {
-            return OO_CSS_Parser::parse(func_get_args());
-        }
-    }
-
-
-    /**
     * @method   OO_CSS_Parser::debug
     * @access   public
     * For generic debug messages that require higher verbosity
@@ -69,7 +57,7 @@ class OO_CSS_Parser {
         return $new;
     }
 
-
+    
     /**
     * @method   OO_CSS_Parser::parse
     * @access   protected
@@ -119,7 +107,14 @@ class OO_CSS_Parser {
         
                             case '{':
                                 OO_CSS_Parser::debug("Found start of statement list!");
-                                array_push($rule_stack, trim(substr($token, 0, -1)));
+                                if (empty($rule_stack)) {
+                                    array_push($rule_stack, rtrim(trim(substr($token, 0, -1))));
+                                }
+                                else {
+                                    $current = implode(' ', $rule_stack);
+                                    $new_sel = array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))));
+                                    array_push($rule_stack, $current.' '.implode(', '.$current.' ', $new_sel));
+                                }
                                 $token = '';
                             break;
         
@@ -131,7 +126,7 @@ class OO_CSS_Parser {
         
                             case ';':
                                 OO_CSS_Parser::debug("Found end of rule!");
-                                $rules[implode(" ", $rule_stack)][] = trim($token);
+                                $rules[end($rule_stack)][] = trim($token);
                                 $token = '';
                             break;
         
@@ -147,7 +142,6 @@ class OO_CSS_Parser {
                                 if ('*' === $prev) {
                                     OO_CSS_Parser::debug("Found end of comment!");
                                     $in_comment = false;
-                                    var_dump($token);
                                     if ('/**/' !== $token) {
                                         $token = '';
                                     }
@@ -177,13 +171,13 @@ class OO_CSS_Parser {
                         $result .= "/* $file */\n\n";
                     }
 
-                    $result = '';
+                    $result = array();
         
                     foreach ($rules as $selector => $styles) {
-                        $result .= $selector . " {\n    " . join ("\n    ", $styles) . "\n}\n";
+                        $result[] = $selector . " {\n    " . join ("\n    ", $styles) . "\n}\n";
                     }
 
-                    $results[] = $result;
+                    $results[] = implode('', $result);
                 }
                 else {
                     OO_CSS_Parser::warn("$file not readable");
