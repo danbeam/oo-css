@@ -171,5 +171,8 @@ If you have more than one file, a comment indicating the filename will be automa
 
 And lastly, like I've mentioned before, you can do magical things like OO CSS -> CSS -> minified -> gzipped in one line of bash!
 
-    me@host:oo-css(master)$ php oo_css.php some/file.oocss 2>/dev/null | yui --type css | gzip -c > ready_for_prod.css.gz && zcat ready_for_prod.css.gz && echo
+    me@host:oo-css(master)$ php oo_css.php some/file.oocss 2>/dev/null | \
+    yui --type css | gzip -c > ready_for_prod.css.gz && \
+    echo && zcat ready_for_prod.css.gz && echo
+    
     .class{background-color:white;}.class span{margin-bottom:10px;}
