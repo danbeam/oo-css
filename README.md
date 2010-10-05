@@ -77,7 +77,7 @@ Or for Redhat based systems, use -
 
 I'm too lazy to look up how to do it using Gentoo or Puppy or Archlinux - send me a patch, haha.
 
-On Windows, I'd recommend either XAMPP (http://www.apachefriends.org/en/xampp.html) or WAMP server (http://wampserver.com/en).  I don't really use Windows much any more, so I can't tell you if it works or not, but PHP in general has pretty good cross-platform compatibility (though my tests don't, as they use `exec` in an assumed bash environment).
+On Windows, I'd recommend either [XAMPP](http://www.apachefriends.org/en/xampp.html) or [WAMP server](http://wampserver.com/en).  I don't really use Windows much any more, so I can't tell you if it works or not, but PHP in general has pretty good cross-platform compatibility (though my tests don't, as they use `exec` in an assumed bash environment).
 
 **NOTE:** You've just installed the PHP command line "runtime".  If you want the full capability to serve stuff from a web server like Apache, you can try these alternate commands to install more stuff (instead of just php-cli)
 
@@ -177,4 +177,4 @@ And lastly, like I've mentioned before, you can do magical things like OO CSS ->
     
     .class{background-color:white;}.class span{margin-bottom:10px;}
 
-**NOTE:** This assumes you have the YUI Compressor (http://yuilibrary.com/downloads/#yuicompressor) jar on your path and Java and gzip installed.
+**NOTE:** This assumes you have the [YUI Compressor](http://yuilibrary.com/downloads/#yuicompressor) jar on your path and Java and gzip installed.
