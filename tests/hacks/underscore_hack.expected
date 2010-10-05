@@ -1,6 +1,0 @@
-.class {
-    _background-color: white;
-}
-.class span {
-    _margin-bottom: 10px;
-}

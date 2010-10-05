@@ -6,8 +6,8 @@ require_once dirname(dirname(__FILE__)).'/oo_css.php';
 class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
 
     public function setUp () {
-        $this->tests = glob(dirname(__FILE__).'/*/*.test');
-        $this->expected = glob(dirname(__FILE__).'/*/*.expected');
+        $this->tests = glob(dirname(__FILE__).'/*/*.oocss');
+        $this->expected = glob(dirname(__FILE__).'/*/*.css');
         $this->proxy = new OO_CSS_Parser();
     }
 
@@ -21,14 +21,14 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
         echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
             $this->assertTrue(
-                in_array(substr($test, 0, -5) . ".expected", $this->expected),
+                in_array(substr($test, 0, -6) . ".css", $this->expected),
                 "$test doesn't have an expected result to compare to!"
             );
         }
     }
 
     public function fileToDesc ($file) {
-        return str_replace('_', ' ', ucfirst(substr(basename($file), 0, -5)));
+        return str_replace('_', ' ', ucfirst(substr(basename($file), 0, -6)));
     }
 
     public function testAll () {
@@ -41,7 +41,7 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
 ///         echo "---------------------------------------------------------------------------------\n";
 ///         echo $this->proxy->parse($test);
             $this->assertEquals(
-                file_get_contents(substr($test, 0, -5).".expected"),
+                file_get_contents(substr($test, 0, -6).".css"),
                 $this->proxy->parse($test),
                 $this->fileToDesc($test)
             );
@@ -56,7 +56,7 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
             // exec to emulate PHP CLI use
             exec('php ' . dirname(dirname(__FILE__)) . '/oo_css.php ' . $test . ' 2>/dev/null', $actual);
             $this->assertEquals(
-                rtrim(file_get_contents(substr($test, 0, -5).".expected")),
+                rtrim(file_get_contents(substr($test, 0, -6).".css")),
                 implode("\n", $actual),
                 $this->fileToDesc($test)
             );
@@ -67,7 +67,7 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
         echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
             $this->assertEquals(
-                file_get_contents(substr($test, 0, -5).".expected"),
+                file_get_contents(substr($test, 0, -6).".css"),
                 OO_CSS_Parser::parse($test),
                 $this->fileToDesc($tests)
             );

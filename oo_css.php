@@ -167,11 +167,11 @@ class OO_CSS_Parser {
                         }
                     }
         
-                    if (count($files) > 1) {
-                        $result .= "/* $file */\n\n";
-                    }
-
                     $result = array();
+
+                    if (count($files) > 1) {
+                        $result[] = "/* $file */\n\n";
+                    }
         
                     foreach ($rules as $selector => $styles) {
                         $result[] = $selector . " {\n    " . join ("\n    ", $styles) . "\n}\n";
