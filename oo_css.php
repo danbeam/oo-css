@@ -111,9 +111,15 @@ class OO_CSS_Parser {
                                     array_push($rule_stack, rtrim(trim(substr($token, 0, -1))));
                                 }
                                 else {
-                                    $current = implode(' ', $rule_stack);
-                                    $new_sel = array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))));
-                                    array_push($rule_stack, $current.' '.implode(', '.$current.' ', $new_sel));
+                                    $computed = array();
+                                    $parents  = array_map('rtrim', array_map('trim', explode(',', implode(' ', $rule_stack))));
+                                    $children = array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))));
+                                    foreach ($parents as $parent) {
+                                        foreach ($children as $child) {
+                                            $computed[] = $parent.' '.$child;
+                                        }
+                                    }
+                                    array_push($rule_stack, implode(', ', $computed));
                                 }
                                 $token = '';
                             break;

@@ -1,0 +1,6 @@
+.parent1, .parent2 {
+    color: blue;
+    #id, .class, div > span, input[type=submit], *:first-child+html {
+        background: url(some/image/that/doesnt/exist.png);
+    }
+}
