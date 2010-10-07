@@ -171,7 +171,7 @@ Formats
 
 Recently, I added formats for your CSS output for those of you that are sticklers for maintaining a code style (perhaps with exist code) or just like flexiblity.  My script must basically rebuild everything it finds from scratch.  This has the benefit of being able to generate the CSS in an organized fashion, but has the disadvantage of only using allowed formats.  So, in an attempt to not force anybody to a certain style, I've made the following formats:
 
-**1tbs, 01tb, default**
+**1tbs, 0tbs, default**
 
     .selector {
         rule: value;
