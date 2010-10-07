@@ -62,17 +62,6 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
             );
         }
     }
-
-    public function testStatic() {
-        echo "\n" . str_pad(__METHOD__, 60);
-        foreach ($this->tests as $test) {
-            $this->assertEquals(
-                file_get_contents(substr($test, 0, -6).".css"),
-                OO_CSS_Parser::parse($test),
-                $this->fileToDesc($tests)
-            );
-        }
-    }
 }
 
 ?>

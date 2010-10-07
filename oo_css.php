@@ -11,6 +11,43 @@ define('WARN', true);
 class OO_CSS_Parser {
 
     /**
+    * @method   OO_CSS_Parser::__construct
+    * @access   public
+    * Instantiation and configuration
+    */
+    public function __construct($style = '1tbs') {
+        switch ($style) {
+            case 'minified':
+                $this->format = array(
+                    'b1' => "%s{",
+                    'r'  => "",
+                    'b2' => "}",
+                    'm'  => ",",
+                    'd'  => '/[:();{},]/',
+                );
+            break;
+            case 'stallman':
+                $this->format = array(
+                    'b1' => "%s\n{\n    ",
+                    'r'  => "\n    ",
+                    'b2' => "\n}\n",
+                    'm'  => ", ",
+                    'd'  => '/[;{},]/',
+                );
+            break;
+            case '0tbs': case '1tbs': default:
+                $this->format = array(
+                    'b1' => "%s {\n    ",
+                    'r'  => "\n    ",
+                    'b2' => "\n}\n",
+                    'm'  => ", ",
+                    'd'  => '/[;{},]/',
+                );
+            break;
+        }
+    }
+
+    /**
     * @method   OO_CSS_Parser::debug
     * @access   public
     * For generic debug messages that require higher verbosity
@@ -19,6 +56,7 @@ class OO_CSS_Parser {
         if (true === DEBUG) {
             echo "$msg\n";
         }
+        return $this;
     }
 
     /**
@@ -30,6 +68,7 @@ class OO_CSS_Parser {
         if (true === WARN) {
             file_put_contents('php://stderr', "$msg\n", FILE_APPEND);
         }
+        return $this;
     }
 
     /**
@@ -44,7 +83,7 @@ class OO_CSS_Parser {
         foreach ($args as $arg) {
             // recurse
             if (is_array($arg)) {
-                OO_CSS_Parser::flatten($arg, $new);
+                $this->flatten($arg, $new);
             }
             // base case
             else {
@@ -65,15 +104,18 @@ class OO_CSS_Parser {
     public function parse () {
 
         // flatten args to allow different ways of calling thi method
-        $files = OO_CSS_Parser::flatten(func_get_args());
-
-        // set up global to hold rendered content
-        $results = array();
+        $files = $this->flatten(func_get_args());
 
         // if no files, what to do?
         if (empty($files)) {
             trigger_error("No files given");
         }
+
+        // set up global to hold rendered content
+        $results = array();
+
+        // set up alias for convenience
+        $format =& $this->format;
 
         // this will work with only 1 file, too
         foreach($files as $file) {
@@ -94,18 +136,18 @@ class OO_CSS_Parser {
                         // read a char at a time
                         $token .= ($char = fread($handle, 1));
 
-                        //OO_CSS_Parser::debug("char: $char ".($in_comment?'(comment)':''));
-                        //OO_CSS_Parser::debug("prev: $prev");
-                        //OO_CSS_Parser::debug("token: $token");
-                        //OO_CSS_Parser::debug("stack: " . print_r($rule_stack, true));
+                        //$this->debug("char: $char ".($in_comment?'(comment)':''));
+                        //$this->debug("prev: $prev");
+                        //$this->debug("token: $token");
+                        //$this->debug("stack: " . print_r($rule_stack, true));
         
                         // main loop
                         switch ($char) {
         
                             case '{':
-                                OO_CSS_Parser::debug("Found start of statement list!");
+                                $this->debug("Found start of statement list!");
                                 if (empty($rule_stack)) {
-                                    array_push($rule_stack, implode(', ', array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))))));
+                                    array_push($rule_stack, implode($this->format['m'], array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))))));
                                 }
                                 else {
                                     $computed = array();
@@ -117,58 +159,58 @@ class OO_CSS_Parser {
                                             $computed[] = $parent.' '.$child;
                                         }
                                     }
-                                    array_push($rule_stack, implode(', ', $computed));
+                                    array_push($rule_stack, implode($this->format['m'], $computed));
                                 }
                                 $token = '';
                             break;
         
                             case '}':
-                                OO_CSS_Parser::debug("Found end of statement list!");
+                                $this->debug("Found end of statement list!");
                                 array_pop($rule_stack);
                                 $token = '';
                             break;
         
                             case ';':
-                                OO_CSS_Parser::debug("Found end of rule!");
-                                $rules[end($rule_stack)][] = trim($token);
+                                $this->debug("Found end of rule!");
+                                $block[end($rule_stack)][] = trim($token);
                                 $token = '';
                             break;
         
                             case '*':
                                 if ('/' === $prev) {
-                                    OO_CSS_Parser::debug("Found start of comment!");
+                                    $this->debug("Found start of comment!");
                                     $in_comment = true;
                                 }
-                                OO_CSS_Parser::debug("Found normal token \"$char\"!");
+                                $this->debug("Found normal token \"$char\"!");
                             break;
         
                             case '/':
                                 if ('*' === $prev) {
-                                    OO_CSS_Parser::debug("Found end of comment!");
+                                    $this->debug("Found end of comment!");
                                     $in_comment = false;
                                     if ('/**/' !== $token) {
                                         $token = '';
                                     }
                                 }
-                                OO_CSS_Parser::debug("Found normal token \"$char\"!");
+                                $this->debug("Found normal token \"$char\"!");
                             break;
         
                             case ' ': case "\t":
-                                if (preg_match('/[;{}\/,]/', $prev)) {
+                                if (preg_match($format['d'], $prev)) {
                                     $token = trim($token);
                                     $char = '';
                                 }
                             break;
         
                             case "\n": case "\r":
-                                if (preg_match('/[;{}\/,]/', $prev)) {
+                                if (preg_match($format['d'], $prev)) {
                                     $token = rtrim($token);
                                     $char = '';
                                 }
                             break;
 
                             default:
-                                OO_CSS_Parser::debug("Found normal token \"$char\"!");
+                                $this->debug("Found normal token \"$char\"!");
                             break;
         
                         }
@@ -183,19 +225,23 @@ class OO_CSS_Parser {
                     if (count($files) > 1) {
                         $result[] = "/* $file */\n\n";
                     }
-        
-                    foreach ($rules as $selector => $styles) {
-                        $result[] = $selector . " {\n    " . join ("\n    ", $styles) . "\n}\n";
+                    
+                    foreach ($block as $selector => $rules) {
+                        $result[] = str_replace(
+                                        array('%s', '%b1', '%b2'),
+                                        array($selector, $format['b1'], $format['b2']),
+                                        $format['b1'].join($format['r'], $rules).$format['b2']
+                                    );
                     }
 
                     $results[] = implode('', $result);
                 }
                 else {
-                    OO_CSS_Parser::warn("$file not readable");
+                    $this->warn("$file not readable");
                 }
             }
             else {
-                OO_CSS_Parser::warn("$file not readable");
+                $this->warn("$file not readable");
             }
         }
         if (!empty($results)) {
@@ -206,8 +252,16 @@ class OO_CSS_Parser {
 
 // if we're on the CLI, check for arguments
 if ('cli' === php_sapi_name() && $argc > 1) {
-    // output this to stderr so normal > redirection doesn't work
-    OO_CSS_Parser::warn('Found arguments on CLI, parsing...');
+    // get options from CLI args
+    $args = getopt('s:');
+    // if we found a style, remove those args
+    if ($args['s']) {
+        array_splice($argv, array_search('-s', $argv), 2);
+    }
+    // create an instance
+    $parser = new OO_CSS_Parser($args['s']);
+    // output warning to stderr so normal > redirection doesn't work
+    $parser->warn('Found arguments on CLI, parsing...');
     // parse all arguments passed in on CLI
-    ob_start(); echo OO_CSS_Parser::parse(array_slice($argv, 1)); ob_end_flush();
+    ob_start(); echo $parser->parse(array_slice($argv, 1)); ob_end_flush();
 }

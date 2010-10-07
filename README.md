@@ -60,6 +60,7 @@ With which we automatically re-arrange to:
 
 Well, look no more!  This is what OO-CSS does for you with 1 simple PHP script!
 
+
 How do I use this?
 ------------------
 
@@ -95,16 +96,13 @@ If you simply `require`, `include`, `require_once`, or `include_once` the /oo_cs
 * warn  (write message to stderr if WARN constant is truthy)
 * debug (write message to stdout if DEBUG constant is truthy)
 
-This can be done with an instance of OO_CSS_Parser, like so:
+This can be done by creating an instance of OO_CSS_Parser, like so:
 
     $oo_css = new OO_CSS_Parser();
+
+and then giving it a list of files to parse:
+
     $oo_css->parse('some/files/to/go/to.css');
-
-### Using statically
-
-Or alternately can be called statically (without an instance), like so:
-
-    OO_CSS_Parser::parse('a/file.css');
 
 ### Using PHP on the command line
 
