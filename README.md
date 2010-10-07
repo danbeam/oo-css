@@ -117,19 +117,6 @@ And then you can run the parser with the `php` command on any number of files or
     php oo_css.php css/src_file.oocss
     php oo_css.php css/*.oocss
 
-Or additionally, you can add the line
-
-    #!/usr/bin/env php
-
-at the top of oo_css.php, and run the command
-
-    chmod u+x path/to/oo_css.php
-
-adding execution permissions for your user to run that file like so:
-
-    ./oo_css.php css/src_file.oocss
-    ./oo_css.php css/*.oocss
-
 Examples and tricks
 -------------------
 
@@ -178,3 +165,35 @@ And lastly, like I've mentioned before, you can do magical things like OO CSS ->
     .class{background-color:white;}.class span{margin-bottom:10px;}
 
 **NOTE:** This assumes you have the [YUI Compressor](http://yuilibrary.com/downloads/#yuicompressor) jar on your path (named yui and with executable permissions) as well as Java and gzip installed.
+
+Formats
+-------
+
+Recently, I added formats for your CSS output for those of you that are sticklers for maintaining a code style (perhaps with exist code) or just like flexiblity.  My script must basically rebuild everything it finds from scratch.  This has the benefit of being able to generate the CSS in an organized fashion, but has the disadvantage of only using allowed formats.  So, in an attempt to not force anybody to a certain style, I've made the following formats:
+
+**1tbs, 01tb, default**
+
+    .selector {
+        rule: value;
+    }
+
+**stallman**
+
+    .selector
+    {
+        rule: value;
+    }
+
+**minified**
+
+    .selector{rule:value;}
+
+**NOTE** The minification is crude, as this script is not truly a CSS parser - more a partial lexer (it really only identify blocks and rules), so minification with the "minified" format will not sub-optimize like a smarter minifier (again, like YUI Compressor) would.  However, if you're lazy and you want a one-stop solution for smaller CSS (i.e. you weren't going to run a better compressor anyways), this isn't a horrible option.
+
+These options can be passed as a string to the `__constructor` when creating the parser, i.e.
+
+    $parser = new OO_CSS_Parser('stallman');
+
+Or can be sent on the CLI with the `-s` option
+
+    php oo_css.php -s stallman [files to be converted...]
