@@ -196,8 +196,8 @@ Recently, I added formats for your CSS output for those of you that are stickler
 
 These options can be passed as a string to the `__constructor` when creating the parser, i.e.
 
-    $parser = new OO_CSS_Parser('stallman');
+    $parser = new OO_CSS_Parser('allman');
 
 Or can be sent on the CLI with the `-s` option
 
-    php oo_css.php -s stallman [files to be converted...]
+    php oo_css.php -s allman [files to be converted...]
