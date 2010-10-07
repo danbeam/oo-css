@@ -177,12 +177,16 @@ Recently, I added formats for your CSS output for those of you that are stickler
         rule: value;
     }
 
-**stallman**
+**allman**
 
     .selector
     {
         rule: value;
     }
+
+**oneline[r]**
+
+    .selector { rule: value; }
 
 **minified**
 

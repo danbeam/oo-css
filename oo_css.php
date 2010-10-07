@@ -26,11 +26,20 @@ class OO_CSS_Parser {
                     'd'  => '/[:();{},]/',
                 );
             break;
-            case 'stallman':
+            case 'allman':
                 $this->format = array(
                     'b1' => "%s\n{\n    ",
                     'r'  => "\n    ",
                     'b2' => "\n}\n",
+                    'm'  => ", ",
+                    'd'  => '/[;{},]/',
+                );
+            break;
+            case 'oneline': case 'one-line': case 'oneliner': case 'one-liner':  
+                $this->format = array(
+                    'b1' => "%s { ",
+                    'r'  => " ",
+                    'b2' => " }\n",
                     'm'  => ", ",
                     'd'  => '/[;{},]/',
                 );
