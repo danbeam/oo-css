@@ -21,7 +21,6 @@ class OO_CSS_Parser {
         }
     }
 
-
     /**
     * @method   OO_CSS_Parser::warn
     * @access   public
@@ -32,7 +31,6 @@ class OO_CSS_Parser {
             file_put_contents('php://stderr', "$msg\n", FILE_APPEND);
         }
     }
-
 
     /**
     * @method   OO_CSS_Parser::flatten
@@ -57,7 +55,6 @@ class OO_CSS_Parser {
         return $new;
     }
 
-    
     /**
     * @method   OO_CSS_Parser::parse
     * @access   protected
@@ -108,12 +105,13 @@ class OO_CSS_Parser {
                             case '{':
                                 OO_CSS_Parser::debug("Found start of statement list!");
                                 if (empty($rule_stack)) {
-                                    array_push($rule_stack, rtrim(trim(substr($token, 0, -1))));
+                                    array_push($rule_stack, implode(', ', array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))))));
                                 }
                                 else {
                                     $computed = array();
-                                    $parents  = array_map('rtrim', array_map('trim', explode(',', implode(' ', $rule_stack))));
+                                    $parents  = array_map('rtrim', array_map('trim', explode(',', end($rule_stack))));
                                     $children = array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))));
+                                    //var_dump(array('rule_stack' => $rule_stack, 'parents' => $parents, 'children' => $children));
                                     foreach ($parents as $parent) {
                                         foreach ($children as $child) {
                                             $computed[] = $parent.' '.$child;
@@ -155,13 +153,20 @@ class OO_CSS_Parser {
                                 OO_CSS_Parser::debug("Found normal token \"$char\"!");
                             break;
         
-                            case ' ': case "\n": case "\r": case "\t":
-                                if (preg_match('/[;{}\/]/', $prev)) {
-                                    $token = rtrim(trim($token));
+                            case ' ': case "\t":
+                                if (preg_match('/[;{}\/,]/', $prev)) {
+                                    $token = trim($token);
                                     $char = '';
                                 }
                             break;
         
+                            case "\n": case "\r":
+                                if (preg_match('/[;{}\/,]/', $prev)) {
+                                    $token = rtrim($token);
+                                    $char = '';
+                                }
+                            break;
+
                             default:
                                 OO_CSS_Parser::debug("Found normal token \"$char\"!");
                             break;

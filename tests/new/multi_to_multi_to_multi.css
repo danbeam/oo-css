@@ -1,0 +1,9 @@
+.gp1, .gp2 {
+    color: blue;
+}
+.gp1 #p1, .gp1 #p2, .gp2 #p1, .gp2 #p2 {
+    background: url(some/image/that/doesnt/exist.png);
+}
+.gp1 #p1 c1, .gp1 #p1 c2, .gp1 #p2 c1, .gp1 #p2 c2, .gp2 #p1 c1, .gp2 #p1 c2, .gp2 #p2 c1, .gp2 #p2 c2 {
+    opacity: 1;
+}
