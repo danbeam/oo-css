@@ -145,17 +145,7 @@ And now we can parse the file from OO to something browsers better understand:
         margin-bottom: 10px;
     }
 
-If you have more than one file, a comment indicating the filename will be automatically output above each file, like this:
-
-    me@host:oo-css(master)$ echo && php oo_css.php tests/new/*.oocss 2>/dev/null
-    
-    /* some/file.oocss */
-
-    /* yada yada, CSS goes here */
-
-    /* some/other/file.oocss */
-    
-    /* and so on */
+### Rule expansion
 
 Additionally, I recently added the feature of being able to expand multiple rules to a value. So say we have something like this:
 
@@ -174,6 +164,20 @@ It will be expanded to multiple properties with the single value!
         padding: none;
         border: none;
     }
+
+### Minification / gzipping / combining
+
+If you have more than one file, a comment indicating the filename will be automatically output above each file, like this:
+
+    me@host:oo-css(master)$ echo && php oo_css.php tests/new/*.oocss 2>/dev/null
+    
+    /* some/file.oocss */
+
+    /* yada yada, CSS goes here */
+
+    /* some/other/file.oocss */
+    
+    /* and so on */
 
 And lastly, like I've mentioned before, you can do magical things like OO CSS -> CSS -> minified -> gzipped in one line of bash!
 
