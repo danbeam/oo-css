@@ -70,7 +70,7 @@ Currently, this project is written in object-oriented PHP5.  Until anyone cares 
 
 So, first you'll need some kind of environment that can run PHP5.  If you're using a Debian based Linux system, you'll need to do something like -
 
-    $ sudo apt-get install php5-cli
+    **$** sudo apt-get install php5-cli
 
 Or for Redhat based systems, use -
 
