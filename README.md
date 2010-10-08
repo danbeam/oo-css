@@ -68,7 +68,7 @@ How do I use this?
 
 Currently, this project is written in object-oriented PHP5.  Until anyone cares enough for me to port it, it'll probably stay that way.
 
-So, first you'll need some kind of environment that can run PHP5.  If you're using a Debian-based Linux system, you'll need to do something like -
+So, first you'll need some kind of environment that can run PHP5.  If you're using a Debian based Linux system, you'll need to do something like -
 
     sudo apt-get install php5-cli
 
