@@ -157,6 +157,24 @@ If you have more than one file, a comment indicating the filename will be automa
     
     /* and so on */
 
+Additionally, I recently added the feature of being able to expand multiple rules to a value. So say we have something like this:
+
+    me@host:oo-css(master)$ echo && cat tests/new/multiple_rules.oocss 
+
+    #id {
+        margin, padding, border: none;
+    }
+
+It will be expanded to multiple properties with the single value!
+
+    me@host:oo-css(master)$ echo && php oo_css.php tests/new/multiple_rules.oocss 2>/dev/null
+
+    #id {
+        margin: none;
+        padding: none;
+        border: none;
+    }
+
 And lastly, like I've mentioned before, you can do magical things like OO CSS -> CSS -> minified -> gzipped in one line of bash!
 
     me@host:oo-css(master)$ php oo_css.php some/file.oocss 2>/dev/null | yui --type css | gzip -c > ready_for_prod.css.gz && \
