@@ -181,7 +181,12 @@ class OO_CSS_Parser {
         
                             case ';':
                                 $this->debug("Found end of rule!");
-                                $block[end($rule_stack)][] = trim($token);
+                                list($rules, $value) = explode(':', $token);
+                                $rules = array_map('trim', array_map('rtrim', explode(',', $rules)));
+                                $value = trim($value);
+                                foreach ($rules as $rule) {
+                                    $block[end($rule_stack)][] = $rule.': '.$value;
+                                }
                                 $token = '';
                             break;
         
