@@ -11,14 +11,27 @@ define('WARN', true);
 class OO_CSS_Parser {
 
     /**
+    * @access   protected
+    * Various formatting aspects of our output
+    */
+    protected static $format = array(
+        'b1' => "%s {\n    ",
+        'r'  => "\n    ",
+        'b2' => "\n}\n",
+        'm'  => ", ",
+        'd'  => '/[;{},]/',
+    );
+
+    /**
     * @method   OO_CSS_Parser::__construct
     * @access   public
     * Instantiation and configuration
     */
     public function __construct($style = '1tbs') {
+        $format =& self::$format;
         switch ($style) {
             case 'minified':
-                $this->format = array(
+                $format = array(
                     'b1' => "%s{",
                     'r'  => "",
                     'b2' => "}",
@@ -27,7 +40,7 @@ class OO_CSS_Parser {
                 );
             break;
             case 'allman':
-                $this->format = array(
+                $format = array(
                     'b1' => "%s\n{\n    ",
                     'r'  => "\n    ",
                     'b2' => "\n}\n",
@@ -36,7 +49,7 @@ class OO_CSS_Parser {
                 );
             break;
             case 'oneline': case 'one-line': case 'oneliner': case 'one-liner':  
-                $this->format = array(
+                $format = array(
                     'b1' => "%s { ",
                     'r'  => " ",
                     'b2' => " }\n",
@@ -45,13 +58,7 @@ class OO_CSS_Parser {
                 );
             break;
             case '0tbs': case '1tbs': default:
-                $this->format = array(
-                    'b1' => "%s {\n    ",
-                    'r'  => "\n    ",
-                    'b2' => "\n}\n",
-                    'm'  => ", ",
-                    'd'  => '/[;{},]/',
-                );
+                // stick with default
             break;
         }
     }
@@ -92,7 +99,7 @@ class OO_CSS_Parser {
         foreach ($args as $arg) {
             // recurse
             if (is_array($arg)) {
-                $this->flatten($arg, $new);
+                self::flatten($arg, $new);
             }
             // base case
             else {
@@ -113,7 +120,7 @@ class OO_CSS_Parser {
     public function parse () {
 
         // flatten args to allow different ways of calling thi method
-        $files = $this->flatten(func_get_args());
+        $files = self::flatten(func_get_args());
 
         // if no files, what to do?
         if (empty($files)) {
@@ -124,7 +131,7 @@ class OO_CSS_Parser {
         $results = array();
 
         // set up alias for convenience
-        $format =& $this->format;
+        $format =& self::$format;
 
         // this will work with only 1 file, too
         foreach($files as $file) {
@@ -145,18 +152,20 @@ class OO_CSS_Parser {
                         // read a char at a time
                         $token .= ($char = fread($handle, 1));
 
-                        //$this->debug("char: $char ".($in_comment?'(comment)':''));
-                        //$this->debug("prev: $prev");
-                        //$this->debug("token: $token");
-                        //$this->debug("stack: " . print_r($rule_stack, true));
+                        //if (DEBUG) {
+                        //    self::debug("char: $char ".($in_comment?'(comment)':''));
+                        //    self::debug("prev: $prev");
+                        //    self::debug("token: $token");
+                        //    self::debug("stack: " . print_r($rule_stack, true));
+                        //}
         
                         // main loop
                         switch ($char) {
         
                             case '{':
-                                $this->debug("Found start of statement list!");
+                                if (DEBUG) self::debug("Found start of statement list!");
                                 if (empty($rule_stack)) {
-                                    array_push($rule_stack, implode($this->format['m'], array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))))));
+                                    array_push($rule_stack, implode($format['m'], array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))))));
                                 }
                                 else {
                                     $computed = array();
@@ -168,19 +177,19 @@ class OO_CSS_Parser {
                                             $computed[] = $parent.' '.$child;
                                         }
                                     }
-                                    array_push($rule_stack, implode($this->format['m'], $computed));
+                                    array_push($rule_stack, implode($format['m'], $computed));
                                 }
                                 $token = '';
                             break;
         
                             case '}':
-                                $this->debug("Found end of statement list!");
+                                if (DEBUG) self::debug("Found end of statement list!");
                                 array_pop($rule_stack);
                                 $token = '';
                             break;
         
                             case ';':
-                                $this->debug("Found end of rule!");
+                                if (DEBUG) self::debug("Found end of rule!");
                                 list($rules, $value) = explode(':', $token);
                                 $rules = array_map('trim', array_map('rtrim', explode(',', $rules)));
                                 $value = trim($value);
@@ -192,21 +201,21 @@ class OO_CSS_Parser {
         
                             case '*':
                                 if ('/' === $prev) {
-                                    $this->debug("Found start of comment!");
+                                    if (DEBUG) self::debug("Found start of comment!");
                                     $in_comment = true;
                                 }
-                                $this->debug("Found normal token \"$char\"!");
+                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                             break;
         
                             case '/':
                                 if ('*' === $prev) {
-                                    $this->debug("Found end of comment!");
+                                    if (DEBUG) self::debug("Found end of comment!");
                                     $in_comment = false;
                                     if ('/**/' !== $token) {
                                         $token = '';
                                     }
                                 }
-                                $this->debug("Found normal token \"$char\"!");
+                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                             break;
         
                             case ' ': case "\t":
@@ -224,7 +233,7 @@ class OO_CSS_Parser {
                             break;
 
                             default:
-                                $this->debug("Found normal token \"$char\"!");
+                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                             break;
         
                         }
@@ -251,11 +260,11 @@ class OO_CSS_Parser {
                     $results[] = implode('', $result);
                 }
                 else {
-                    $this->warn("$file not readable");
+                    if (WARN) self::warn("$file not readable");
                 }
             }
             else {
-                $this->warn("$file not readable");
+                if (WARN) self::warn("$file not readable");
             }
         }
         if (!empty($results)) {
