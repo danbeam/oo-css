@@ -68,13 +68,13 @@ How do I use this?
 
 Currently, this project is written in object-oriented PHP5.  Until anyone cares enough for me to port it, it'll probably stay that way.
 
-So, first you'll need some kind of environment that can run PHP5.  If you're using a Debian-based Linux system, you'll need to do something like -
+So, first you'll need some kind of environment that can run PHP5.  If you're using a Debian based Linux system, you'll need to do something like -
 
-    sudo apt-get install php5-cli
+    $ sudo apt-get install php5-cli
 
 Or for Redhat based systems, use -
 
-    sudo yum install php-cli
+    $ sudo yum install php-cli
 
 I'm too lazy to look up how to do it using Gentoo or Puppy or Archlinux - send me a patch, haha.
 
@@ -82,11 +82,11 @@ On Windows, I'd recommend either [XAMPP](http://www.apachefriends.org/en/xampp.h
 
 **NOTE:** You've just installed the PHP command line "runtime".  If you want the full capability to serve stuff from a web server like Apache, you can try these alternate commands to install more stuff (instead of just php-cli)
 
-    sudo apt-get install php
+    $ sudo apt-get install php
 
 or
 
-    sudo yum install php
+    $ sudo yum install php
 
 ### Including as a class
 
@@ -110,19 +110,19 @@ And lastly, for those CLI junkies like myself, you can run OO_CSS_Parser from th
 
 Here's how you get it:
 
-    git clone git://github.com/danbeam/oo-css.git && cd oo-css ; # we're now within our newly cloned repo!
+    $ git clone git://github.com/danbeam/oo-css.git && cd oo-css ; # we're now within our newly cloned repo!
 
 And then you can run the parser with the `php` command on any number of files or globs you want to be converted:
 
-    php oo_css.php css/src_file.oocss
-    php oo_css.php css/*.oocss
+    $ php oo_css.php css/src_file.oocss
+    $ php oo_css.php css/*.oocss
 
 Examples and tricks
 -------------------
 
 Here's an example of before:
 
-    me@host:oo-css(master)$ echo && cat tests/new/simple_class_and_element.oocss
+    $ echo && cat tests/new/simple_class_and_element.oocss
     
     .class {
     
@@ -136,7 +136,7 @@ Here's an example of before:
 
 And now we can parse the file from OO to something browsers better understand:
 
-    me@host:oo-css(master)$ echo && php oo_css.php tests/new/simple_class_and_element.oocss 2>/dev/null
+    $ echo && php oo_css.php tests/new/simple_class_and_element.oocss 2>/dev/null
     
     .class {
         background-color: white;
@@ -145,9 +145,31 @@ And now we can parse the file from OO to something browsers better understand:
         margin-bottom: 10px;
     }
 
+### Rule expansion
+
+Additionally, I recently added the feature of being able to expand multiple rules to a value. So say we have something like this:
+
+    $ echo && cat tests/new/multiple_rules.oocss 
+
+    #id {
+        margin, padding, border: none;
+    }
+
+It will be expanded to multiple properties with the single value!
+
+    $ echo && php oo_css.php tests/new/multiple_rules.oocss 2>/dev/null
+
+    #id {
+        margin: none;
+        padding: none;
+        border: none;
+    }
+
+### Minification / gzipping / combining
+
 If you have more than one file, a comment indicating the filename will be automatically output above each file, like this:
 
-    me@host:oo-css(master)$ echo && php oo_css.php tests/new/*.oocss 2>/dev/null
+    $ echo && php oo_css.php tests/new/*.oocss 2>/dev/null
     
     /* some/file.oocss */
 
@@ -157,27 +179,9 @@ If you have more than one file, a comment indicating the filename will be automa
     
     /* and so on */
 
-Additionally, I recently added the feature of being able to expand multiple rules to a value. So say we have something like this:
-
-    me@host:oo-css(master)$ echo && cat tests/new/multiple_rules.oocss 
-
-    #id {
-        margin, padding, border: none;
-    }
-
-It will be expanded to multiple properties with the single value!
-
-    me@host:oo-css(master)$ echo && php oo_css.php tests/new/multiple_rules.oocss 2>/dev/null
-
-    #id {
-        margin: none;
-        padding: none;
-        border: none;
-    }
-
 And lastly, like I've mentioned before, you can do magical things like OO CSS -> CSS -> minified -> gzipped in one line of bash!
 
-    me@host:oo-css(master)$ php oo_css.php some/file.oocss 2>/dev/null | yui --type css | gzip -c > ready_for_prod.css.gz && \
+    $ php oo_css.php some/file.oocss 2>/dev/null | yui --type css | gzip -c > ready_for_prod.css.gz && \
     echo && zcat ready_for_prod.css.gz && echo
     
     .class{background-color:white;}.class span{margin-bottom:10px;}
