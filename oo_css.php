@@ -20,6 +20,7 @@ class OO_CSS_Parser {
         'b2' => "\n}\n",
         'm'  => ", ",
         'd'  => '/[;{},]/',
+        's'  => ': ',
     );
 
     /**
@@ -30,13 +31,14 @@ class OO_CSS_Parser {
     public function __construct($style = '1tbs') {
         $format =& self::$format;
         switch ($style) {
-            case 'minified':
+            case 'minified': case 'min': case 'minned':
                 $format = array(
                     'b1' => "%s{",
                     'r'  => "",
                     'b2' => "}",
                     'm'  => ",",
                     'd'  => '/[:();{},]/',
+                    's'  => ':',
                 );
             break;
             case 'allman':
@@ -46,6 +48,7 @@ class OO_CSS_Parser {
                     'b2' => "\n}\n",
                     'm'  => ", ",
                     'd'  => '/[;{},]/',
+                    's'  => ': ',
                 );
             break;
             case 'oneline': case 'one-line': case 'oneliner': case 'one-liner':  
@@ -55,6 +58,7 @@ class OO_CSS_Parser {
                     'b2' => " }\n",
                     'm'  => ", ",
                     'd'  => '/[;{},]/',
+                    's'  => ': ',
                 );
             break;
             case '0tbs': case '1tbs': default:
@@ -69,9 +73,7 @@ class OO_CSS_Parser {
     * For generic debug messages that require higher verbosity
     */
     public function debug ($msg = "") {
-        if (true === DEBUG) {
-            echo "$msg\n";
-        }
+        echo "$msg\n";
         return $this;
     }
 
@@ -81,9 +83,7 @@ class OO_CSS_Parser {
     * For warnings like files not being found or readable
     */
     public function warn ($msg = "") {
-        if (true === WARN) {
-            file_put_contents('php://stderr', "$msg\n", FILE_APPEND);
-        }
+        file_put_contents('php://stderr', "$msg\n", FILE_APPEND);
         return $this;
     }
 
@@ -103,7 +103,7 @@ class OO_CSS_Parser {
             }
             // base case
             else {
-                array_push($new, $arg);
+                $new[] = $arg;
             }
         }
         // return flattened array
@@ -124,7 +124,7 @@ class OO_CSS_Parser {
 
         // if no files, what to do?
         if (empty($files)) {
-            trigger_error("No files given");
+            if (WARN) self::warn("No files given"); exit(1);
         }
 
         // set up global to hold rendered content
@@ -140,10 +140,13 @@ class OO_CSS_Parser {
 
                 if (is_readable($file)) {
 
-                    // set up some pseudo-globals to help us
-                    $token = '';
+                    // set up some primitives to help us out
+                    $line_num = 0;
+                    $token = $prev = $rules = $value = '';
+                    $rule_stack = $block = array();
                     $in_comment = false;
-                    $rule_stack = array();
+
+                    // open a handle to our file
                     $handle = fopen($file, 'r');
 
                     // old school way
@@ -161,74 +164,92 @@ class OO_CSS_Parser {
         
                         // main loop
                         switch ($char) {
-        
+
                             case '{':
-                                if (DEBUG) self::debug("Found start of statement list!");
-                                if (empty($rule_stack)) {
-                                    array_push($rule_stack, implode($format['m'], array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))))));
-                                }
-                                else {
-                                    $computed = array();
-                                    $parents  = array_map('rtrim', array_map('trim', explode(',', end($rule_stack))));
-                                    $children = array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))));
-                                    //var_dump(array('rule_stack' => $rule_stack, 'parents' => $parents, 'children' => $children));
-                                    foreach ($parents as $parent) {
-                                        foreach ($children as $child) {
-                                            $computed[] = $parent.' '.$child;
-                                        }
+                                if (!$in_comment) {
+                                    if (DEBUG) self::debug("Found start of statement list!");
+                                    if (empty($rule_stack)) {
+                                        $rule_stack[] = implode($format['m'], array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1)))));
                                     }
-                                    array_push($rule_stack, implode($format['m'], $computed));
+                                    else {
+                                        $computed = array();
+                                        $parents  = array_map('rtrim', array_map('trim', explode(',', end($rule_stack))));
+                                        $children = array_map('rtrim', array_map('trim', explode(',', substr($token, 0, -1))));
+                                        //var_dump(array('rule_stack' => $rule_stack, 'parents' => $parents, 'children' => $children));
+                                        foreach ($parents as $parent) {
+                                            foreach ($children as $child) {
+                                                $computed[] = $parent.' '.$child;
+                                            }
+                                        }
+                                        $rule_stack[] = implode($format['m'], $computed);
+                                    }
+                                    $token = '';
                                 }
-                                $token = '';
                             break;
         
                             case '}':
-                                if (DEBUG) self::debug("Found end of statement list!");
-                                array_pop($rule_stack);
-                                $token = '';
+                                if (!$in_comment) {
+                                    if (DEBUG) self::debug("Found end of statement list!");
+                                    array_pop($rule_stack);
+                                    $token = '';
+                                }
                             break;
         
                             case ';':
-                                if (DEBUG) self::debug("Found end of rule!");
-                                list($rules, $value) = explode(':', $token);
-                                $rules = array_map('trim', array_map('rtrim', explode(',', $rules)));
-                                $value = trim($value);
-                                foreach ($rules as $rule) {
-                                    $block[end($rule_stack)][] = $rule.': '.$value;
+                                if (!$in_comment) {
+                                    if (DEBUG) self::debug("Found end of rule!");
+                                    $rule_split = explode(':', $token);
+                                    if (!isset($rule_split[1])) {
+                                        //self::warn(print_r($rule_split, true));
+                                        if (WARN) self::warn('Syntax error at line #'.$line_num);
+                                        exit(1);
+                                    }
+                                    $rules = array_map('trim', array_map('rtrim', explode(',', $rule_split[0])));
+                                    $value = rtrim(trim($rule_split[1]));
+                                    $recent_rule = end($rule_stack);
+                                    foreach ($rules as $rule) {
+                                        $block[$recent_rule][] = array('rule' => $rule, 'value' => $value);
+                                    }
+                                    $token = '';
                                 }
-                                $token = '';
                             break;
         
                             case '*':
+                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                                 if ('/' === $prev) {
                                     if (DEBUG) self::debug("Found start of comment!");
                                     $in_comment = true;
                                 }
-                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                             break;
         
                             case '/':
+                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                                 if ('*' === $prev) {
-                                    if (DEBUG) self::debug("Found end of comment!");
                                     $in_comment = false;
-                                    if ('/**/' !== $token) {
+                                    if (DEBUG) self::debug("Found end of comment!");
+                                    if ('/**/' !== $token || '/*\*/' !== $token) {
                                         $token = '';
                                     }
                                 }
-                                if (DEBUG) self::debug("Found normal token \"$char\"!");
                             break;
         
                             case ' ': case "\t":
-                                if (preg_match($format['d'], $prev)) {
-                                    $token = trim($token);
-                                    $char = '';
+                                if (!$in_comment) {
+                                    if (preg_match($format['d'], $prev)) {
+                                        $token = trim($token);
+                                        $char = '';
+                                    }
                                 }
                             break;
         
                             case "\n": case "\r":
-                                if (preg_match($format['d'], $prev)) {
-                                    $token = rtrim($token);
-                                    $char = '';
+                                ++$line_num;
+                                if (DEBUG) self::debug("On line #$line_num");
+                                if (!$in_comment) {
+                                    if (preg_match($format['d'], $prev)) {
+                                        $token = rtrim($token);
+                                        $char = '';
+                                    }
                                 }
                             break;
 
@@ -249,12 +270,24 @@ class OO_CSS_Parser {
                         $result[] = "/* $file */\n\n";
                     }
                     
-                    foreach ($block as $selector => $rules) {
-                        $result[] = str_replace(
-                                        array('%s', '%b1', '%b2'),
-                                        array($selector, $format['b1'], $format['b2']),
-                                        $format['b1'].join($format['r'], $rules).$format['b2']
-                                    );
+                    foreach ($block as $selector => $statement) {
+                        $rule_map = $rules = array();
+                        // eliminate duplicate rules
+                        foreach ($statement as $rule) {
+                            $rule_map[$rule['rule']] = $rule['value'];
+                        }
+                        // alphabetize rules (why we needed to de-dupe)
+                        ksort($rule_map);
+                        // .reconstruct-the {inside:"of a block";}
+                        foreach($rule_map as $rule => $value) {
+                            $rules[] = $rule.$format['s'].$value;
+                        }
+                        // add and format the results
+                        $results[] = str_replace(
+                            array('%s', '%b1', '%b2'),
+                            array($selector, $format['b1'], $format['b2']),
+                            $format['b1'] . implode($format['r'], $rules) . $format['b2']
+                        );
                     }
 
                     $results[] = implode('', $result);
@@ -268,23 +301,30 @@ class OO_CSS_Parser {
             }
         }
         if (!empty($results)) {
-            return implode("\n", $results);
+            return implode('', $results);
         }
     }
 }
 
+// I have no idea why $argv (ini setting register_argc_argv) is different from $_SERVER['argv']
+$argv_norm = isset($argv) ? array_slice($argv, 1) : array_slice($_SERVER['argv'], 2);
+
 // if we're on the CLI, check for arguments
-if ('cli' === php_sapi_name() && $argc > 1) {
+if ('cli' === php_sapi_name() && count($argv_norm) > 0) {
     // get options from CLI args
     $args = getopt('s:');
     // if we found a style, remove those args
-    if ($args['s']) {
-        array_splice($argv, array_search('-s', $argv), 2);
+    if (isset($args['s'])) {
+        array_splice($argv_norm, array_search('-s', $argv_norm), 2);
+        // create an instance
+        $parser = new OO_CSS_Parser($args['s']);
     }
-    // create an instance
-    $parser = new OO_CSS_Parser($args['s']);
+    else {
+        // create an instance
+        $parser = new OO_CSS_Parser();
+    }
     // output warning to stderr so normal > redirection doesn't work
-    $parser->warn('Found arguments on CLI, parsing...');
+    if (WARN) $parser->warn('Found arguments on CLI, parsing...');
     // parse all arguments passed in on CLI
-    ob_start(); echo $parser->parse(array_slice($argv, 1)); ob_end_flush();
+    ob_start(); echo $parser->parse($argv_norm); ob_end_flush();
 }

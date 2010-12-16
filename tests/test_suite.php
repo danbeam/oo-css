@@ -28,7 +28,7 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
     }
 
     public function fileToDesc ($file) {
-        return str_replace('_', ' ', ucfirst(substr(basename($file), 0, -6)));
+        return str_replace('_', ' ', ucfirst(basename(dirname($file))) . ' > ' . ucfirst(substr(basename($file), 0, -6)));
     }
 
     public function testAll () {

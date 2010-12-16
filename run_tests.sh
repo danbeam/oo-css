@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/usr/bin/phpunit tests/test_suite.php 2>&1
+phpunit tests/test_suite.php 2>&1
