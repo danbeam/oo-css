@@ -287,13 +287,18 @@ class OO_CSS_Parser {
                         $rule_map = $rules = array();
                         // eliminate duplicate rules
                         foreach ($statement as $rule) {
-                            $rule_map[$rule['rule']] = $rule['value'];
+                            if (!isset($rule_map[$rule['rule']])) {
+                                $rule_map[$rule['rule']] = array();
+                            }
+                            $rule_map[$rule['rule']][] = $rule['value'];
                         }
                         // alphabetize rules (why we needed to de-dupe)
                         ksort($rule_map);
                         // .reconstruct-the {inside:"of a block";}
-                        foreach($rule_map as $rule => $value) {
-                            $rules[] = $rule.$format['s'].$value;
+                        foreach ($rule_map as $attr => $vals) {
+                            foreach ($vals as $val) {
+                                $rules[] = $attr.$format['s'].$val;
+                            }
                         }
                         // if minned, take off the last ; in the {block}
                         if ('minned' === $format['id']) {

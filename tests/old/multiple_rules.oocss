@@ -1,4 +1,5 @@
 #id {
+    /* eventually need to simplify these into 1, but I'm too lazy to look for !imporant at the moment */
     background: url(some/image/that/doesnt/exist1.png);
     background: url(some/image/that/doesnt/exist2.png);
     background: url(some/image/that/doesnt/exist3.png);
