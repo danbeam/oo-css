@@ -15,6 +15,7 @@ class OO_CSS_Parser {
     * Various formatting aspects of our output
     */
     protected static $format = array(
+        'id' => "default",
         'b1' => "%s {\n    ",
         'r'  => "\n    ",
         'b2' => "\n}\n",
@@ -33,6 +34,7 @@ class OO_CSS_Parser {
         switch ($style) {
             case 'minified': case 'min': case 'minned':
                 $format = array(
+                    'id' => "minned",
                     'b1' => "%s{",
                     'r'  => "",
                     'b2' => "}",
@@ -43,6 +45,7 @@ class OO_CSS_Parser {
             break;
             case 'allman':
                 $format = array(
+                    'id' => "allman",
                     'b1' => "%s\n{\n    ",
                     'r'  => "\n    ",
                     'b2' => "\n}\n",
@@ -53,6 +56,7 @@ class OO_CSS_Parser {
             break;
             case 'oneline': case 'one-line': case 'oneliner': case 'one-liner':  
                 $format = array(
+                    'id' => "oneline",
                     'b1' => "%s { ",
                     'r'  => " ",
                     'b2' => " }\n",
@@ -190,6 +194,16 @@ class OO_CSS_Parser {
                             case '}':
                                 if (!$in_comment) {
                                     if (DEBUG) self::debug("Found end of statement list!");
+                                    // check for one last rule without a ; (valid at the end of blocks)
+                                    $rule_split = explode(':', $token);
+                                    if (isset($rule_split[1])) {
+                                        $rules = array_map('trim', array_map('rtrim', explode(',', $rule_split[0])));
+                                        $value = rtrim(trim(substr($rule_split[1], 0, -1).';'));
+                                        $recent_rule = end($rule_stack);
+                                        foreach ($rules as $rule) {
+                                            $block[$recent_rule][] = array('rule' => $rule, 'value' => $value);
+                                        }
+                                    }
                                     array_pop($rule_stack);
                                     $token = '';
                                 }
@@ -282,12 +296,19 @@ class OO_CSS_Parser {
                         foreach($rule_map as $rule => $value) {
                             $rules[] = $rule.$format['s'].$value;
                         }
-                        // add and format the results
-                        $results[] = str_replace(
-                            array('%s', '%b1', '%b2'),
-                            array($selector, $format['b1'], $format['b2']),
-                            $format['b1'] . implode($format['r'], $rules) . $format['b2']
-                        );
+                        // if minned, take off the last ; in the {block}
+                        if ('minned' === $format['id']) {
+                            $rules[] = substr(array_pop($rules), 0, -1);
+                        }
+                        // if it's .not-empty {}
+                        if (!empty($rules)) {
+                            // add and format the results
+                            $results[] = str_replace(
+                                array('%s', '%b1', '%b2'),
+                                array($selector, $format['b1'], $format['b2']),
+                                $format['b1'] . implode($format['r'], $rules) . $format['b2']
+                            );
+                        }
                     }
 
                     $results[] = implode('', $result);

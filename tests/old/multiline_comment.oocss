@@ -1,0 +1,18 @@
+.right-here{display:block;outline:none}/* hey guys. this below is deprecated */
+/*
+blah
+blah: blah
+blah: blah;
+a { blah: blah; }
+*/.for-realz{color:red;}/*
+forgot this part too!
+#id { yo: dawg; } .class { fuck: yeah!; } */
+#also-me
+{
+
+    background:none;
+    color: blue;
+
+}/*
+one more thing
+*/
