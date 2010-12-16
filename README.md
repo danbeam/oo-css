@@ -212,7 +212,7 @@ Recently, I added formats for your CSS output for those of you that are stickler
 
 **minified**
 
-    .selector{rule:value;}
+    .selector{rule:value}
 
 **NOTE:** The minification is crude, as this script is not truly a CSS parser - more a partial lexer (it really only identify blocks and rules), so minification with the "minified" format will not sub-optimize like a smarter minifier (again, like YUI Compressor) would.  However, if you're lazy and you want a one-stop solution for smaller CSS (i.e. you weren't going to run a better compressor anyways), this isn't a horrible option.
 
