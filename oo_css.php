@@ -212,14 +212,13 @@ class OO_CSS_Parser {
                             case ';':
                                 if (!$in_comment) {
                                     if (DEBUG) self::debug("Found end of rule!");
-                                    $rule_split = explode(':', $token);
-                                    if (!isset($rule_split[1])) {
+                                    if (false === ($colon_pos = strpos($token, ':'))) {
                                         //self::warn(print_r($rule_split, true));
-                                        if (WARN) self::warn('Syntax error at line #'.$line_num);
+                                        if (WARN) self::warn('Syntax error around line #'.$line_num);
                                         exit(1);
                                     }
-                                    $rules = array_map('trim', array_map('rtrim', explode(',', $rule_split[0])));
-                                    $value = rtrim(trim($rule_split[1]));
+                                    $rules = array_map('trim', array_map('rtrim', explode(',', substr($token, 0, $colon_pos))));
+                                    $value = rtrim(trim(substr($token, $colon_pos + 1)));
                                     $recent_rule = end($rule_stack);
                                     foreach ($rules as $rule) {
                                         $block[$recent_rule][] = array('rule' => $rule, 'value' => $value);
@@ -345,7 +344,7 @@ if ('cli' === php_sapi_name() && count($argv_norm) > 0) {
         $parser = new OO_CSS_Parser();
     }
     // output warning to stderr so normal > redirection doesn't work
-    if (WARN) $parser->warn('Found arguments on CLI, parsing...');
+    //if (WARN) $parser->warn('Found arguments on CLI, parsing...');
     // parse all arguments passed in on CLI
     ob_start(); echo $parser->parse($argv_norm); ob_end_flush();
 }
