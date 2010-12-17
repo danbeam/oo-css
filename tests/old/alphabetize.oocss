@@ -1,0 +1,8 @@
+#alpha-order {
+    border: 1px solid black;
+    border-width: 10px;
+    border-left-color: red;
+    border-top-width: 1px;
+    border-top-height: 1px;
+    border-style: dashed;
+}
