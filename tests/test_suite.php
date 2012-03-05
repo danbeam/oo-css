@@ -2,19 +2,14 @@
 
 require_once dirname(dirname(__FILE__)).'/oo_css.php';
 
-class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
+class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
 
     public function setUp () {
         $this->testDir = dirname(__FILE__);
         $this->tests = glob($this->testDir.'/*/*.oocss');
         $this->expected = glob($this->testDir.'/*/*.css');
         $this->proxy = new OO_CSS_Parser();
-    }
-
-    public function tearDown () {
-        $this->tests = null;
-        $this->expected = null;
-        $this->proxy = null;
+        $this->croaked = false;
     }
 
     public function testExpected () {
@@ -64,4 +59,13 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
             $this->assertThat($result, $this->stringcontains('/* ' . $file . ' */'));
         }
     }
+
+    public function testCroaksOnEmptyFileList () {
+        $mock = $this->getMock('OO_CSS_Parser', array('croak', 'warn'));
+        $mock->expects($this->any())
+             ->method('croak')
+             ->with($this->equalTo('No files given'));
+        $mock->parse();
+    }
+
 }
