@@ -5,8 +5,9 @@ require_once dirname(dirname(__FILE__)).'/oo_css.php';
 class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
 
     public function setUp () {
-        $this->tests = glob(dirname(__FILE__).'/*/*.oocss');
-        $this->expected = glob(dirname(__FILE__).'/*/*.css');
+        $this->testDir = dirname(__FILE__);
+        $this->tests = glob($this->testDir.'/*/*.oocss');
+        $this->expected = glob($this->testDir.'/*/*.css');
         $this->proxy = new OO_CSS_Parser();
     }
 
