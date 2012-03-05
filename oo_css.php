@@ -2,8 +2,10 @@
 
 error_reporting(E_ALL);
 
-define('DEBUG', false);
-define('WARN', true);
+if (!defined('DEBUG'))
+    define('DEBUG', false);
+if (!defined('WARN'))
+    define('WARN', true);
 
 /**
 * @access   public
@@ -119,6 +121,26 @@ class OO_CSS_Parser {
     }
 
     /**
+    * @method   OO_CSS_Parser::canRead
+    * @access   protected
+    * @return   Whether the file can be read or not.
+    * This is mainly overridden for testing purposes.
+    */
+    protected function canRead ($file) {
+        return is_readable($file);
+    }
+
+    /**
+    * @method   OO_CSS_Parser::fileExists
+    * @access   protected
+    * @return   Whether the file exists or not.
+    * This is mainly overridden for testing purposes.
+    */
+    protected function fileExists ($file) {
+        return is_file($file);
+    }
+
+    /**
     * @method   OO_CSS_Parser::parse
     * @access   protected
     * @param    any kind of multi-dimensional array or any number of paramaters
@@ -141,9 +163,9 @@ class OO_CSS_Parser {
         // this will work with only 1 file, too
         foreach($files as $file) {
 
-            if (is_file($file)) {
+            if ($this->fileExists($file)) {
 
-                if (is_readable($file)) {
+                if ($this->canRead($file)) {
 
                     // set up some primitives to help us out
                     $line_num = 0;

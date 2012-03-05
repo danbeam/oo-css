@@ -62,10 +62,37 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
 
     public function testCroaksOnEmptyFileList () {
         $mock = $this->getMock('OO_CSS_Parser', array('croak', 'warn'));
-        $mock->expects($this->any())
+        $mock->expects($this->once())
              ->method('croak')
              ->with($this->equalTo('No files given'));
         $mock->parse();
+    }
+
+    public function testWarnIfFileDoesntExist () {
+        $file = microtime(true) . '.oocss';
+        $mock = $this->getMock('OO_CSS_Parser', array('croak', 'warn', 'fileExists'));
+        $mock->expects($this->once())
+             ->method('fileExists')
+             ->will($this->returnValue(false));
+        $mock->expects($this->once())
+             ->method('warn')
+             ->with($this->equalTo($file . ' not readable'));
+        $mock->parse($file);
+    }
+
+    public function testWarnIfFileNotReadable () {
+        $file = microtime(true) . '.oocss';
+        $mock = $this->getMock('OO_CSS_Parser', array('croak', 'warn', 'canRead', 'fileExists'));
+        $mock->expects($this->once())
+             ->method('fileExists')
+             ->will($this->returnValue(true));
+        $mock->expects($this->once())
+             ->method('canRead')
+             ->will($this->returnValue(false));
+        $mock->expects($this->once())
+             ->method('warn')
+             ->with($this->equalTo($file . ' not readable'));
+        $mock->parse($file);
     }
 
 }
