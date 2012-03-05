@@ -17,7 +17,6 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
     }
 
     public function testExpected () {
-        echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
             $this->assertTrue(
                 in_array(substr($test, 0, -6) . ".css", $this->expected),
@@ -31,7 +30,6 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
     }
 
     public function testAll () {
-        echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
             $this->assertEquals(
                 file_get_contents(substr($test, 0, -6).".css"),
@@ -42,7 +40,6 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
     }
 
     public function testAllCLI () {
-        echo "\n" . str_pad(__METHOD__, 60);
         foreach ($this->tests as $test) {
             // reset this to blank string every time
             $actual = '';
