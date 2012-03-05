@@ -53,4 +53,15 @@ class OO_CSS_Tests extends PHPUnit_Framework_TestCase {
             );
         }
     }
+
+    public function testMultipleFiles () {
+        $files = array(
+            $this->testDir.'/new/multi_to_multi.oocss',
+            $this->testDir.'/new/multiple_rules.oocss',
+        );
+        $result = $this->proxy->parse($files);
+        foreach ($files as $file) {
+            $this->assertThat($result, $this->stringcontains('/* ' . $file . ' */'));
+        }
+    }
 }

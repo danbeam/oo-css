@@ -198,7 +198,7 @@ class OO_CSS_Parser {
                                     $rule_split = explode(':', $token);
                                     if (isset($rule_split[1])) {
                                         $rules = array_map('trim', array_map('rtrim', explode(',', $rule_split[0])));
-                                        $value = rtrim(trim(substr($rule_split[1], 0, -1).';'));
+                                        $value = trim(substr($rule_split[1], 0, -1).';');
                                         $recent_rule = end($rule_stack);
                                         foreach ($rules as $rule) {
                                             $block[$recent_rule][] = array('rule' => $rule, 'value' => $value);
@@ -218,7 +218,7 @@ class OO_CSS_Parser {
                                         exit(1);
                                     }
                                     $rules = array_map('trim', array_map('rtrim', explode(',', substr($token, 0, $colon_pos))));
-                                    $value = rtrim(trim(substr($token, $colon_pos + 1)));
+                                    $value = trim(substr($token, $colon_pos + 1));
                                     $recent_rule = end($rule_stack);
                                     foreach ($rules as $rule) {
                                         $block[$recent_rule][] = array('rule' => $rule, 'value' => $value);
@@ -260,7 +260,7 @@ class OO_CSS_Parser {
                                 if (DEBUG) self::debug("On line #$line_num");
                                 if (!$in_comment) {
                                     if (preg_match($format['d'], $prev)) {
-                                        $token = rtrim($token);
+                                        $token = trim($token);
                                         $char = '';
                                     }
                                 }
@@ -277,7 +277,7 @@ class OO_CSS_Parser {
                         }
                     }
         
-                    $result = count($files) > 1 ? array("/* $file */\n\n") : array();
+                    $result = count($files) > 1 ? array("\n\n/* $file */\n") : array();
                     
                     foreach ($block as $selector => $statement) {
                         $rule_map = $rules = array();
@@ -302,8 +302,8 @@ class OO_CSS_Parser {
                         }
                         // if it's .not-empty {}
                         if (!empty($rules)) {
-                            // add and format the results
-                            $results[] = str_replace(
+                            // add and format the result
+                            $result[] = str_replace(
                                 array('%s', '%b1', '%b2'),
                                 array($selector, $format['b1'], $format['b2']),
                                 $format['b1'] . implode($format['r'], $rules) . $format['b2']
@@ -322,7 +322,8 @@ class OO_CSS_Parser {
             }
         }
         if (!empty($results)) {
-            return implode('', $results);
+            // Only ltrim() to remove extra lines from /* file */ comments.
+            return ltrim(implode('', $results));
         }
     }
 }
