@@ -277,11 +277,7 @@ class OO_CSS_Parser {
                         }
                     }
         
-                    $result = array();
-
-                    if (count($files) > 1) {
-                        $result[] = "/* $file */\n\n";
-                    }
+                    $result = count($files) > 1 ? array("/* $file */\n\n") : array();
                     
                     foreach ($block as $selector => $statement) {
                         $rule_map = $rules = array();
