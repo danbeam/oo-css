@@ -69,7 +69,7 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
         );
         $result = $this->proxy->parse($files);
         foreach ($files as $file) {
-            $this->assertThat($result, $this->stringcontains('/* ' . $file . ' */'));
+            $this->assertThat($result, $this->stringContains('/* ' . $file . ' */'));
         }
     }
 
@@ -118,11 +118,18 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
                 foreach (array('minned', 'allman', '1tbs', 'oneline') as $format) {
                     $parser = new OO_CSS_Parser($format);
                     $this->assertEquals(
-                        $parser->parse($test),
-                        file_get_contents($this->formatFile($test, $format))
+                        file_get_contents($this->formatFile($test, $format)),
+                        $parser->parse($test)
                     );
                 }
             }
         }
+    }
+
+    public function testDebugMessages () {
+        $msg = 'blah blee blar';
+        ob_start();
+        $this->proxy->debug($msg);
+        $this->assertEquals($msg . "\n", ob_get_clean());
     }
 }
