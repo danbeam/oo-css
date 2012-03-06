@@ -12,8 +12,15 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
         $this->croaked = false;
     }
 
+    public function isFormatTest ($file) {
+        return false !== strpos($file, implode(DIRECTORY_SEPARATOR, array('', 'tests', 'format', '')));
+    }
+
     public function testExpected () {
         foreach ($this->tests as $test) {
+            if ($this->isFormatTest($test)) {
+                continue;
+            }
             $this->assertTrue(
                 in_array(substr($test, 0, -6) . ".css", $this->expected),
                 "$test doesn't have an expected result to compare to!"
@@ -27,6 +34,9 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
 
     public function testAll () {
         foreach ($this->tests as $test) {
+            if ($this->isFormatTest($test)) {
+                continue;
+            }
             $this->assertEquals(
                 file_get_contents(substr($test, 0, -6).".css"),
                 $this->proxy->parse($test),
@@ -37,6 +47,9 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
 
     public function testAllCLI () {
         foreach ($this->tests as $test) {
+            if ($this->isFormatTest($test)) {
+                continue;
+            }
             // reset this to blank string every time
             $actual = '';
             // exec to emulate PHP CLI use
@@ -95,4 +108,21 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
         $mock->parse($file);
     }
 
+    public function formatFile ($file, $format) {
+        return substr($file, 0, -6) . ".$format.css";
+    }
+
+    public function testFormats () {
+        foreach ($this->tests as $test) {
+            if ($this->isFormatTest($test)) {
+                foreach (array('minned', 'allman', '1tbs', 'oneline') as $format) {
+                    $parser = new OO_CSS_Parser($format);
+                    $this->assertEquals(
+                        $parser->parse($test),
+                        file_get_contents($this->formatFile($test, $format))
+                    );
+                }
+            }
+        }
+    }
 }

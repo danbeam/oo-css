@@ -1,0 +1,9 @@
+.blah {
+    color: black; /* default */
+    .blee {
+        margin, padding, left, top, bottom, right: 0;
+        a {
+            color: red;
+        }
+    }
+}
