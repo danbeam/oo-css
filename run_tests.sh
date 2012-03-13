@@ -6,4 +6,4 @@ if [ ! -z "$JENKINS_URL" ]; then
   conf="phpunit.jenkins.xml";
 fi
 
-phpunit -c "$conf" --debug $@ 2>&1 | egrep -v '^-.* not readable$'
+phpunit -c "$conf" --debug $@ 2>&1

@@ -354,9 +354,11 @@ class OO_CSS_Parser {
 $argv_norm = isset($argv) ? array_slice($argv, 1) : array_slice($_SERVER['argv'], 2);
 
 // if we're on the CLI, check for arguments
-if ('cli' === php_sapi_name() && count($argv_norm) > 0) {
+if ('cli' === php_sapi_name() && !defined('TESTING')) {
+
     // get options from CLI args
     $args = getopt('s:');
+
     // if we found a style, remove those args
     if (isset($args['s'])) {
         array_splice($argv_norm, array_search('-s', $argv_norm), 2);
@@ -367,8 +369,21 @@ if ('cli' === php_sapi_name() && count($argv_norm) > 0) {
         // create an instance
         $parser = new OO_CSS_Parser();
     }
+
     // output warning to stderr so normal > redirection doesn't work
     //if (WARN) $parser->warn('Found arguments on CLI, parsing...');
+
+    // left-over args are files
+    $files = array_slice($argv_norm, count($args));
+
+    // check that a proposed file name isn't a bad option
+    foreach ($files as $file) {
+        if ($file{0} === '-' && !is_file($file)) {
+            $parser->croak('Unrecognized option ' . $file);
+        }
+    }
+
     // parse all arguments passed in on CLI
-    ob_start(); echo $parser->parse($argv_norm); ob_end_flush();
+    ob_start(); echo $parser->parse($files); ob_end_flush();
+
 }

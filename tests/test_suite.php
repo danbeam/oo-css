@@ -1,5 +1,7 @@
 <?php
 
+define('TESTING', true);
+
 require_once dirname(dirname(__FILE__)).'/oo_css.php';
 
 class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
@@ -45,18 +47,31 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
         }
     }
 
+    private function execWithArgs ($args) {
+        $parts = array_merge(
+            array('php', dirname(dirname(__FILE__)) . '/oo_css.php'),
+            $args,
+            array('2>&1')
+        );
+        $cmd = implode(' ', $parts);
+        exec($cmd, $output, $status);
+        return array(
+            'command' => $cmd,
+            'output' => implode("\n", $output),
+            'status' => $status,
+        );
+    }
+
     public function testAllCLI () {
         foreach ($this->tests as $test) {
             if ($this->isFormatTest($test)) {
                 continue;
             }
-            // reset this to blank string every time
-            $actual = '';
+            $results = $this->execWithArgs(array($test));
             // exec to emulate PHP CLI use
-            exec('php ' . dirname(dirname(__FILE__)) . '/oo_css.php ' . $test . ' 2>/dev/null', $actual);
             $this->assertEquals(
-                rtrim(file_get_contents(substr($test, 0, -6).".css")),
-                implode("\n", $actual),
+                trim(file_get_contents(substr($test, 0, -6).".css")),
+                $results['output'],
                 $this->fileToDesc($test)
             );
         }
@@ -79,6 +94,17 @@ class OO_CSS_Parser_Test extends PHPUnit_Framework_TestCase {
              ->method('croak')
              ->with($this->equalTo('No files given'));
         $mock->parse();
+    }
+
+    public function testNonZeroExitStatus () {
+        $results = $this->execWithArgs(array());
+        $this->assertEquals(1, $results['status']);
+        $this->assertEquals('No files given', $results['output']);
+
+        $fakeOption = '-zZzZz';
+        $results = $this->execWithArgs(array($fakeOption));
+        $this->assertEquals(1, $results['status']);
+        $this->assertEquals('Unrecognized option ' . $fakeOption, $results['output']);
     }
 
     public function testWarnIfFileDoesntExist () {
